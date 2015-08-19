@@ -14,7 +14,7 @@
 
    <preference name="permissions" value="none"/>
    <preference name="phonegap-version" value="3.7.0" /> 
-   <preference name="orientation" value="default" />
+   <preference name="orientation" value="portrait" />
    <preference name="target-device" value="universal" />
    <preference name="android-minSdkVersion" value="7" />
    <preference name="android-installLocation" value="auto" />
@@ -48,15 +48,15 @@
    <icon src="icon/36.png" gap:platform="android" gap:qualifier="mdpi" /> 
    <icon src="icon/48.png" gap:platform="android" gap:qualifier="hdpi" /> 
    <icon src="icon/64.png" gap:platform="android" gap:qualifier="xhdpi" /> 
-    <gap:splash src="splash/240_400.jpg" gap:platform="android" gap:qualifier="port-ldpi" />  
-   <gap:splash src="splash/320_480.jpg" gap:platform="android" gap:qualifier="port-mdpi" /> 
-   <gap:splash src="splash/480_800.jpg" gap:platform="android" gap:qualifier="port-hdpi" />
-   <gap:splash src="splash/640_960.jpg" gap:platform="android" gap:qualifier="port-xhdpi" />
+    <gap:splash src="splash/240_400.png" gap:platform="android" gap:qualifier="port-ldpi" />  
+   <gap:splash src="splash/320_480.png" gap:platform="android" gap:qualifier="port-mdpi" /> 
+   <gap:splash src="splash/480_800.png" gap:platform="android" gap:qualifier="port-hdpi" />
+   <gap:splash src="splash/640_960.png" gap:platform="android" gap:qualifier="port-xhdpi" />
    
-   <gap:splash src="splash/400_240.jpg" gap:platform="android" gap:qualifier="land-ldpi" /> 
-   <gap:splash src="splash/480_320.jpg" gap:platform="android" gap:qualifier="land-mdpi" /> 
-   <gap:splash src="splash/800_480.jpg" gap:platform="android" gap:qualifier="land-hdpi" />
-   <gap:splash src="splash/960_640.jpg" gap:platform="android" gap:qualifier="land-xhdpi" />
+   <gap:splash src="splash/400_240.png" gap:platform="android" gap:qualifier="land-ldpi" /> 
+   <gap:splash src="splash/480_320.png" gap:platform="android" gap:qualifier="land-mdpi" /> 
+   <gap:splash src="splash/800_480.png" gap:platform="android" gap:qualifier="land-hdpi" />
+   <gap:splash src="splash/960_640.png" gap:platform="android" gap:qualifier="land-xhdpi" />
  
   
    <access origin="*"/>
