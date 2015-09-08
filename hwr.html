@@ -66,10 +66,32 @@ a.button.rotate2:hover{
     </style>
   
   <!-- CSS goes in the document HEAD or added to your external stylesheet -->
-<style type="text/css">
-
+<<style type="text/css">
+table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
 	
+}
+table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
 </style>
+
 
  <script type="text/javascript">
 
@@ -91,6 +113,7 @@ a.button.rotate2:hover{
 	context.clearRect(0, 0, $("#canvas1")[0].width, $("#canvas1")[0].height);
 	moves = [];
     angleArray = [];
+	hasil = [];
   data1_s1 = 0;
   data1_s2 = 0;
   data2_s1 = 0;
@@ -132,7 +155,7 @@ for (var i = -sectorRad / 2; i <= Math.PI * 2 - sectorRad / 2; i += step) {
 
 
 function newCanvas() {
-	var canvas = '<canvas id="canvas1"  width="' + ($(window).width() - 20) + '"  height="' + ($(window).height() - 150) + '"  style="border:0px solid #190c00; max-width: 100%;height: auto;background:url(board.png);background-position: center top; background-size: 100% 100%;background-repeat: no-repeat;" ></canvas>';
+	var canvas = '<canvas id="canvas1"  width="' + ($(window).width() - 20) + '"  height="' + ($(window).height() - 200) + '"  style="border:0px solid #190c00; max-width: 100%;height: auto;background:url(board.png);background-position: center top; background-size: 100% 100%;background-repeat: no-repeat;" ></canvas>';
 	$("#canvas").html(canvas);
 	ctx = document.getElementById("canvas1").getContext("2d");
 	ctx.lineWidth = 4;
@@ -148,7 +171,7 @@ $.fn.drawTouch = function() {
 		ctx.beginPath();
 		ctx.strokeStyle="#ff66b2";
 		x = e.changedTouches[0].pageX - 9;
-		y = e.changedTouches[0].pageY - 9;
+		y = e.changedTouches[0].pageY - 25;
 		ctx.moveTo(x, y);
 		ctx.strokeRect(x, y, 1, 1);
 		lastPositionX = e.changedTouches[0].pageX - $("#canvas1").offset().left;
@@ -163,7 +186,7 @@ $.fn.drawTouch = function() {
 
 		e = e.originalEvent;
 		x = e.changedTouches[0].pageX - 9;
-		y = e.changedTouches[0].pageY - 9;
+		y = e.changedTouches[0].pageY - 25;
 		ctx.lineTo(x, y);
 		ctx.stroke();
 		
@@ -228,7 +251,7 @@ $.fn.drawMouse = function() {
 		ctx.beginPath();
 		ctx.strokeStyle="#ff66b2";
 		x = e.pageX - 9;
-		y = e.pageY - 9;
+		y = e.pageY - 25;
 		ctx.moveTo(x, y);
 		ctx.strokeRect(x, y, 1, 1);
 		lastPositionX = e.clientX - $("#canvas1").offset().left;
@@ -242,7 +265,7 @@ $.fn.drawMouse = function() {
 
 		if (clicked) {
 			x = e.pageX - 9;
-		    y = e.pageY - 9;
+		     y = e.pageY - 25;
 			ctx.lineTo(x, y);
 			ctx.stroke();
 		}
@@ -313,7 +336,16 @@ $.fn.drawMouse = function() {
 function tMax() {
 console.log(hasil);
 	  var max = (_.max(hasil, function(chr) {return chr.probabilitas;}));
-	  document.getElementById("hasil").innerHTML = "Huruf diakui sebagai : " + max.type + " dengan probabilitas :" + max.probabilitas ;
+	  document.getElementById("hasil").innerHTML = "Probabilitas huruf tertinggi adalah : <b>" + max.type + "</b> dengan probabilitas :" + max.probabilitas ;
+	 
+	var table = document.getElementById('table') ;
+    table.innerHTML = "<table width='5px'  id='table_bayes' border='1'><tr><th>Type</th><th>Probabilitas</th></tr></table>";
+	
+	for (i = 0; i < hasil.length; i++) {
+	
+		 document.getElementById('table_bayes').innerHTML += "<tr><td>" + hasil[i].type  + "</td><td>" + hasil[i].probabilitas + "</td></tr>";
+	  }
+	  
 };
 
 
@@ -509,8 +541,13 @@ if (probY == classY) {probY = 0};
 	  <a class="button rotate2" onclick="clearCanvas()" href="#">Ulangi</a>
 	  <a class="button rotate2" onclick="bayesCalc()" href="#">Recognition</a>
 	  <br/><br/><p style="display:inline" id="hasil"></p>
-		
-
+		  <br/><br/>
+	  <div id="table">
+	
+	
+	 
+      </div>
+ 
 
 </body>
 </html>
