@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript"src="js/lodash.min.js"></script>
+	<script type="text/javascript" src="js/training.json"></script>
+     <style type="text/css">
+	 body{
+	
+    font-family: 'Open Sans', sans-serif;
+	background:#fff;
+}
+	 
+	  #content {
+        overflow:hidden;
+		background-color:#ddd;
+	  }
+	  #canvas{
+		cursor:crosshair ;
+        background-color:#fff;
+			
+	  }
+	  
+
+a.button.rotate2 {
+   display: inline-block;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  text-decoration: none;
+	color: #000;
+	font-size: 1em;
+	border:4px solid#bc4229;
+	padding: 0.8em 1em;
+	background: none;
+	font-family: 'Open Sans', sans-serif;
+	-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+}
+a.button.rotate2:hover, a.button.rotate2:focus,a.button.rotate2:active {
+  -webkit-transform: rotate(4deg);
+  transform: rotate(4deg);
+}
+a.button.rotate2 span{
+	width:0px;
+	height:10px;
+	display: inline-block;
+	cursor: pointer;
+	margin-right: 9px;
+	vertical-align:middle;
+	margin: 1px -3px 3px 13px;
+}
+a.button.rotate2:hover{
+	border: 1px solid#bc4229;
+	color: #000;
+}
+	
+    </style>
+  
+  <!-- CSS goes in the document HEAD or added to your external stylesheet -->
+<<style type="text/css">
+table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+	
+}
+table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+</style>
+
+
+ <script type="text/javascript">
+
+ var data1_s1 = 0;
+ var data1_s2 = 0;
+ var data2_s1 = 0;
+ var data2_s2 = 0;
+ var data3_s1 = 0;
+ var data3_s2 = 0;
+ var data4_s1 = 0;
+ var data4_s2 = 0;
+ var data5_s1 = 0;
+ var data5_s2 = 0;
+ var data6_s1 = 0;
+ var data6_s2 = 0;
+ 
+ function clearCanvas() {
+	context = $("#canvas1")[0].getContext('2d');
+	context.clearRect(0, 0, $("#canvas1")[0].width, $("#canvas1")[0].height);
+	moves = [];
+    angleArray = [];
+	hasil = [];
+document.getElementById("table").innerHTML = "" ;
+  data1_s1 = 0;
+  data1_s2 = 0;
+  data2_s1 = 0;
+  data2_s2 = 0;
+  data3_s1 = 0;
+  data3_s2 = 0;
+  data4_s1 = 0;
+  data4_s2 = 0;
+  data5_s1 = 0;
+  data5_s2 = 0;
+  data6_s1 = 0;
+  data6_s2 = 0;
+  document.getElementById("hasil").innerHTML = "" ;
+ // var box = document.getElementById('box');
+ // box.style.display = (box.style.display != 'visible') ? 'none' : '';
+}
+
+
+$(document).ready(function() {
+	newCanvas();
+});
+
+
+var recording = false;
+var lastPositionX = 0;
+var lastPositionY = 0;
+var moves = new Array;
+var angleArray = new Array;
+var sectorRad = Math.PI * 2 / 8;
+var anglesMap = new Array;
+var step = Math.PI * 2 / 100;
+var sector;
+for (var i = -sectorRad / 2; i <= Math.PI * 2 - sectorRad / 2; i += step) {
+	sector = Math.floor((i + sectorRad / 2) / sectorRad);
+	anglesMap.push(sector);
+}
+
+
+
+
+function newCanvas() {
+	var canvas = '<canvas id="canvas1"  width="' + ($(window).width() - 20) + '"  height="' + ($(window).height() - 200) + '"  style="border:0px solid #190c00; max-width: 100%;height: auto;background:url(board.png);background-position: center top; background-size: 100% 100%;background-repeat: no-repeat;" ></canvas>';
+	$("#canvas").html(canvas);
+	ctx = document.getElementById("canvas1").getContext("2d");
+	ctx.lineWidth = 4;
+	$("#canvas1").drawTouch();
+	$("#canvas1").drawMouse();
+}
+
+
+
+$.fn.drawTouch = function() {
+	var start = function(e) {
+		e = e.originalEvent;
+		ctx.beginPath();
+		ctx.strokeStyle="#ff66b2";
+		x = e.changedTouches[0].pageX - 9;
+		y = e.changedTouches[0].pageY - 25;
+		ctx.moveTo(x, y);
+		ctx.strokeRect(x, y, 1, 1);
+		lastPositionX = e.changedTouches[0].pageX - $("#canvas1").offset().left;
+		lastPositionY = e.changedTouches[0].pageY - $("#canvas1").offset().top;
+        recording = true;
+		
+	
+
+	};
+
+	var move = function(e) {
+
+		e = e.originalEvent;
+		x = e.changedTouches[0].pageX - 9;
+		y = e.changedTouches[0].pageY - 25;
+		ctx.lineTo(x, y);
+		ctx.stroke();
+		
+
+
+		if (recording == true) {
+			var msx = (e.changedTouches[0].pageX - $("#canvas1").offset().left);
+			var msy = (e.changedTouches[0].pageY - $("#canvas1").offset().top);
+			var difx = msx - lastPositionX;
+			var dify = msy - lastPositionY;
+			var sqDist = (difx * difx + dify * dify);
+			var sqPrec = (8 * 8);
+			if (sqDist > sqPrec) {
+
+				lastPositionX = msx;
+				lastPositionY = msy;
+				var angle = Math.atan2(difx, dify) + sectorRad / 2;
+				var angleRound = Math.floor(angle * 100);
+				//f = value < 0 ? Math.abs(value) : value;
+				if (angle < 0) angle += Math.PI * 2;
+				var no = Math.floor(angle / (Math.PI * 2) * 100);
+				moves.push(anglesMap[no]);
+				angleArray.push(angleRound);
+				data1_s1 = _.first(_.uniq(angleArray)) ;
+				data2_s1 = _.last(_.uniq(angleArray)) ;
+				data3_s1 = _.first(_.uniq(moves)) ;
+				data4_s1 = _.last(_.uniq(moves)) ;
+				data5_s1 = _.uniq(angleArray).length ;
+				data6_s1 = _.uniq(moves).length ;
+
+			}
+		}
+	};
+
+	var stop = function(e) {
+		clicked = 0;
+		recording = false;
+		lastPositionX = 0;
+		lastPositionY = 0;
+		
+		data1_s2 += data1_s1 ;
+		data2_s2 += data2_s1 ;
+		data3_s2 += data3_s1 ;
+		data4_s2 += data4_s1 ;
+		data5_s2 += data5_s1 ;
+		data6_s2 += data6_s1 ;
+		
+	};
+
+	$(this).on("touchstart", start);
+	$(this).on("touchmove", move);
+	$(this).on("touchend", stop);
+};
+
+
+
+$.fn.drawMouse = function() {
+	var clicked = 0;
+	var start = function(e) {
+		e = e.originalEvent;
+		clicked = 1;
+		ctx.beginPath();
+		ctx.strokeStyle="#ff66b2";
+		x = e.pageX - 9;
+		y = e.pageY - 25;
+		ctx.moveTo(x, y);
+		ctx.strokeRect(x, y, 1, 1);
+		lastPositionX = e.clientX - $("#canvas1").offset().left;
+		lastPositionY = e.clientY - $("#canvas1").offset().top;
+		recording = true;
+		
+	};
+
+	var move = function(e) {
+		e = e.originalEvent;
+
+		if (clicked) {
+			x = e.pageX - 9;
+		     y = e.pageY - 25;
+			ctx.lineTo(x, y);
+			ctx.stroke();
+		}
+		if (recording == true) {
+			var msx = (e.clientX - $("#canvas1").offset().left);
+			var msy = (e.clientY - $("#canvas1").offset().top);
+			var difx = msx - lastPositionX;
+			var dify = msy - lastPositionY;
+			var sqDist = (difx * difx + dify * dify);
+			var sqPrec = (8 * 8);
+
+
+			if (sqDist > sqPrec) {
+
+				lastPositionX = msx;
+				lastPositionY = msy;
+				var angle = Math.atan2(difx, dify) + sectorRad / 2;
+				var angleRound = Math.floor(angle * 100);
+				//f = value < 0 ? Math.abs(value) : value;
+				if (angle < 0) angle += Math.PI * 2;
+				var no = Math.floor(angle / (Math.PI * 2) * 100);
+				moves.push(anglesMap[no]);
+				angleArray.push(angleRound);
+				data1_s1 = _.first(_.uniq(angleArray)) ;
+				data2_s1 = _.last(_.uniq(angleArray)) ;
+				data3_s1 = _.first(_.uniq(moves)) ;
+				data4_s1 = _.last(_.uniq(moves)) ;
+				data5_s1 = _.uniq(angleArray).length ;
+				data6_s1 = _.uniq(moves).length ;
+
+			}
+		}
+
+
+
+	};
+
+	var stop = function(e) {
+		e = e.originalEvent;
+		clicked = 0;
+		recording = false;
+		lastPositionX = 0;
+		lastPositionY = 0;
+		
+		data1_s2 += data1_s1 ;
+		data2_s2 += data2_s1 ;
+		data3_s2 += data3_s1 ;
+		data4_s2 += data4_s1 ;
+		data5_s2 += data5_s1 ;
+		data6_s2 += data6_s1 ;
+		
+
+	
+		console.log(data1_s2 + " " + data2_s2);
+		
+		
+		
+	};
+
+	$(this).on("mousedown", start);
+	$(this).on("mousemove", move);
+	$(this).on("mouseup", stop);
+};
+
+
+ var hasil = [];
+
+function tMax() {
+console.log(hasil);
+	  var max = (_.max(hasil, function(chr) {return chr.probabilitas;}));
+	  document.getElementById("hasil").innerHTML = "Probabilitas huruf tertinggi adalah : <b>" + max.type + "</b> dengan probabilitas :" + max.probabilitas ;
+	 
+	var table = document.getElementById('table') ;
+    table.innerHTML = "<table width='5px'  id='table_bayes' border='1'><tr><th>Type</th><th>Probabilitas</th></tr></table>";
+	
+	for (i = 0; i < hasil.length; i++) {
+	
+		 document.getElementById('table_bayes').innerHTML += "<tr><td>" + hasil[i].type  + "</td><td>" + hasil[i].probabilitas + "</td></tr>";
+	  }
+	  
+};
+
+
+
+  //Batas ---------------------------------
+  function bayesCalc() {
+	var jumlahData = data.length; //jumlah data
+
+	//menghitung jumlah kelas
+	
+	
+var dataA=_.countBy(data,{type:'A'});classA=dataA.true/jumlahData;var dataB=_.countBy(data,{type:'B'});classB=dataB.true/jumlahData;var dataC=_.countBy(data,{type:'C'});classC=dataC.true/jumlahData;var dataD=_.countBy(data,{type:'D'});classD=dataD.true/jumlahData;var dataE=_.countBy(data,{type:'E'});classE=dataE.true/jumlahData;var dataF=_.countBy(data,{type:'F'});classF=dataF.true/jumlahData;var dataH=_.countBy(data,{type:'H'});classH=dataH.true/jumlahData;var dataI=_.countBy(data,{type:'I'});classI=dataI.true/jumlahData;var dataJ=_.countBy(data,{type:'J'});classJ=dataJ.true/jumlahData;var dataK=_.countBy(data,{type:'K'});classK=dataK.true/jumlahData;var dataL=_.countBy(data,{type:'L'});classL=dataL.true/jumlahData;var dataM=_.countBy(data,{type:'M'});classM=dataM.true/jumlahData;var dataN=_.countBy(data,{type:'N'});classN=dataN.true/jumlahData;var dataO=_.countBy(data,{type:'O'});classO=dataO.true/jumlahData;var dataP=_.countBy(data,{type:'P'});classP=dataP.true/jumlahData;var dataR=_.countBy(data,{type:'R'});classR=dataR.true/jumlahData;var dataS=_.countBy(data,{type:'S'});classS=dataS.true/jumlahData;var dataT=_.countBy(data,{type:'T'});classT=dataT.true/jumlahData;var dataU=_.countBy(data,{type:'U'});classU=dataU.true/jumlahData;var dataV=_.countBy(data,{type:'V'});classV=dataV.true/jumlahData;var dataW=_.countBy(data,{type:'W'});classW=dataW.true/jumlahData;var dataZ=_.countBy(data,{type:'Z'});classZ=dataZ.true/jumlahData;    
+var dataG=_.countBy(data,{type:'G'});classG=dataG.true/jumlahData;
+var dataQ=_.countBy(data,{type:'Q'});classQ=dataQ.true/jumlahData;
+var dataX=_.countBy(data,{type:'X'});classX=dataX.true/jumlahData;
+var dataY=_.countBy(data,{type:'Y'});classY=dataY.true/jumlahData;
+
+var kasusA_1=_.countBy(data,{type:'A',first_angle:data1_s2});var pkA_1=kasusA_1.true/dataA.true;if(kasusA_1.false==jumlahData){pkA_1=1;}
+var kasusA_2=_.countBy(data,{type:'A',last_angle:data2_s2});var pkA_2=kasusA_2.true/dataA.true;if(kasusA_2.false==jumlahData){pkA_2=1;}
+var kasusB_1=_.countBy(data,{type:'B',first_angle:data1_s2});var pkB_1=kasusB_1.true/dataB.true;if(kasusB_1.false==jumlahData){pkB_1=1;}
+var kasusB_2=_.countBy(data,{type:'B',last_angle:data2_s2});var pkB_2=kasusB_2.true/dataB.true;if(kasusB_2.false==jumlahData){pkB_2=1;}
+var kasusC_1=_.countBy(data,{type:'C',first_angle:data1_s2});var pkC_1=kasusC_1.true/dataC.true;if(kasusC_1.false==jumlahData){pkC_1=1;}
+var kasusC_2=_.countBy(data,{type:'C',last_angle:data2_s2});var pkC_2=kasusC_2.true/dataC.true;if(kasusC_2.false==jumlahData){pkC_2=1;}
+var kasusD_1=_.countBy(data,{type:'D',first_angle:data1_s2});var pkD_1=kasusD_1.true/dataD.true;if(kasusD_1.false==jumlahData){pkD_1=1;}
+var kasusD_2=_.countBy(data,{type:'D',last_angle:data2_s2});var pkD_2=kasusD_2.true/dataD.true;if(kasusD_2.false==jumlahData){pkD_2=1;}
+var kasusE_1=_.countBy(data,{type:'E',first_angle:data1_s2});var pkE_1=kasusE_1.true/dataE.true;if(kasusE_1.false==jumlahData){pkE_1=1;}
+var kasusE_2=_.countBy(data,{type:'E',last_angle:data2_s2});var pkE_2=kasusE_2.true/dataE.true;if(kasusE_2.false==jumlahData){pkE_2=1;}
+var kasusF_1=_.countBy(data,{type:'F',first_angle:data1_s2});var pkF_1=kasusF_1.true/dataF.true;if(kasusF_1.false==jumlahData){pkF_1=1;}
+var kasusF_2=_.countBy(data,{type:'F',last_angle:data2_s2});var pkF_2=kasusF_2.true/dataF.true;if(kasusF_2.false==jumlahData){pkF_2=1;}
+var kasusH_1=_.countBy(data,{type:'H',first_angle:data1_s2});var pkH_1=kasusH_1.true/dataH.true;if(kasusH_1.false==jumlahData){pkH_1=1;}
+var kasusH_2=_.countBy(data,{type:'H',last_angle:data2_s2});var pkH_2=kasusH_2.true/dataH.true;if(kasusH_2.false==jumlahData){pkH_2=1;}
+var kasusI_1=_.countBy(data,{type:'I',first_angle:data1_s2});var pkI_1=kasusI_1.true/dataI.true;if(kasusI_1.false==jumlahData){pkI_1=1;}
+var kasusI_2=_.countBy(data,{type:'I',last_angle:data2_s2});var pkI_2=kasusI_2.true/dataI.true;if(kasusI_2.false==jumlahData){pkI_2=1;}
+var kasusJ_1=_.countBy(data,{type:'J',first_angle:data1_s2});var pkJ_1=kasusJ_1.true/dataJ.true;if(kasusJ_1.false==jumlahData){pkJ_1=1;}
+var kasusJ_2=_.countBy(data,{type:'J',last_angle:data2_s2});var pkJ_2=kasusJ_2.true/dataJ.true;if(kasusJ_2.false==jumlahData){pkJ_2=1;}
+var kasusK_1=_.countBy(data,{type:'K',first_angle:data1_s2});var pkK_1=kasusK_1.true/dataK.true;if(kasusK_1.false==jumlahData){pkK_1=1;}
+var kasusK_2=_.countBy(data,{type:'K',last_angle:data2_s2});var pkK_2=kasusK_2.true/dataK.true;if(kasusK_2.false==jumlahData){pkK_2=1;}
+var kasusL_1=_.countBy(data,{type:'L',first_angle:data1_s2});var pkL_1=kasusL_1.true/dataL.true;if(kasusL_1.false==jumlahData){pkL_1=1;}
+var kasusL_2=_.countBy(data,{type:'L',last_angle:data2_s2});var pkL_2=kasusL_2.true/dataL.true;if(kasusL_2.false==jumlahData){pkL_2=1;}
+var kasusM_1=_.countBy(data,{type:'M',first_angle:data1_s2});var pkM_1=kasusM_1.true/dataM.true;if(kasusM_1.false==jumlahData){pkM_1=1;}
+var kasusM_2=_.countBy(data,{type:'M',last_angle:data2_s2});var pkM_2=kasusM_2.true/dataM.true;if(kasusM_2.false==jumlahData){pkM_2=1;}
+var kasusN_1=_.countBy(data,{type:'N',first_angle:data1_s2});var pkN_1=kasusN_1.true/dataN.true;if(kasusN_1.false==jumlahData){pkN_1=1;}
+var kasusN_2=_.countBy(data,{type:'N',last_angle:data2_s2});var pkN_2=kasusN_2.true/dataN.true;if(kasusN_2.false==jumlahData){pkN_2=1;}
+var kasusO_1=_.countBy(data,{type:'O',first_angle:data1_s2});var pkO_1=kasusO_1.true/dataO.true;if(kasusO_1.false==jumlahData){pkO_1=1;}
+var kasusO_2=_.countBy(data,{type:'O',last_angle:data2_s2});var pkO_2=kasusO_2.true/dataO.true;if(kasusO_2.false==jumlahData){pkO_2=1;}
+var kasusP_1=_.countBy(data,{type:'P',first_angle:data1_s2});var pkP_1=kasusP_1.true/dataP.true;if(kasusP_1.false==jumlahData){pkP_1=1;}
+var kasusP_2=_.countBy(data,{type:'P',last_angle:data2_s2});var pkP_2=kasusP_2.true/dataP.true;if(kasusP_2.false==jumlahData){pkP_2=1;}
+var kasusR_1=_.countBy(data,{type:'R',first_angle:data1_s2});var pkR_1=kasusR_1.true/dataR.true;if(kasusR_1.false==jumlahData){pkR_1=1;}
+var kasusR_2=_.countBy(data,{type:'R',last_angle:data2_s2});var pkR_2=kasusR_2.true/dataR.true;if(kasusR_2.false==jumlahData){pkR_2=1;}
+var kasusS_1=_.countBy(data,{type:'S',first_angle:data1_s2});var pkS_1=kasusS_1.true/dataS.true;if(kasusS_1.false==jumlahData){pkS_1=1;}
+var kasusS_2=_.countBy(data,{type:'S',last_angle:data2_s2});var pkS_2=kasusS_2.true/dataS.true;if(kasusS_2.false==jumlahData){pkS_2=1;}
+var kasusT_1=_.countBy(data,{type:'T',first_angle:data1_s2});var pkT_1=kasusT_1.true/dataT.true;if(kasusT_1.false==jumlahData){pkT_1=1;}
+var kasusT_2=_.countBy(data,{type:'T',last_angle:data2_s2});var pkT_2=kasusT_2.true/dataT.true;if(kasusT_2.false==jumlahData){pkT_2=1;}
+var kasusU_1=_.countBy(data,{type:'U',first_angle:data1_s2});var pkU_1=kasusU_1.true/dataU.true;if(kasusU_1.false==jumlahData){pkU_1=1;}
+var kasusU_2=_.countBy(data,{type:'U',last_angle:data2_s2});var pkU_2=kasusU_2.true/dataU.true;if(kasusU_2.false==jumlahData){pkU_2=1;}
+var kasusV_1=_.countBy(data,{type:'V',first_angle:data1_s2});var pkV_1=kasusV_1.true/dataV.true;if(kasusV_1.false==jumlahData){pkV_1=1;}
+var kasusV_2=_.countBy(data,{type:'V',last_angle:data2_s2});var pkV_2=kasusV_2.true/dataV.true;if(kasusV_2.false==jumlahData){pkV_2=1;}
+var kasusW_1=_.countBy(data,{type:'W',first_angle:data1_s2});var pkW_1=kasusW_1.true/dataW.true;if(kasusW_1.false==jumlahData){pkW_1=1;}
+var kasusW_2=_.countBy(data,{type:'W',last_angle:data2_s2});var pkW_2=kasusW_2.true/dataW.true;if(kasusW_2.false==jumlahData){pkW_2=1;}
+var kasusZ_1=_.countBy(data,{type:'Z',first_angle:data1_s2});var pkZ_1=kasusZ_1.true/dataZ.true;if(kasusZ_1.false==jumlahData){pkZ_1=1;}
+var kasusZ_2=_.countBy(data,{type:'Z',last_angle:data2_s2});var pkZ_2=kasusZ_2.true/dataZ.true;if(kasusZ_2.false==jumlahData){pkZ_2=1;}
+
+var kasusG_1=_.countBy(data,{type:'G',first_angle:data1_s2});var pkG_1=kasusG_1.true/dataG.true;if(kasusG_1.false==jumlahData){pkG_1=1;}
+var kasusG_2=_.countBy(data,{type:'G',last_angle:data2_s2});var pkG_2=kasusG_2.true/dataG.true;if(kasusG_2.false==jumlahData){pkG_2=1;}
+var kasusQ_1=_.countBy(data,{type:'Q',first_angle:data1_s2});var pkQ_1=kasusQ_1.true/dataQ.true;if(kasusQ_1.false==jumlahData){pkQ_1=1;}
+var kasusQ_2=_.countBy(data,{type:'Q',last_angle:data2_s2});var pkQ_2=kasusQ_2.true/dataQ.true;if(kasusQ_2.false==jumlahData){pkQ_2=1;}
+var kasusX_1=_.countBy(data,{type:'X',first_angle:data1_s2});var pkX_1=kasusX_1.true/dataX.true;if(kasusX_1.false==jumlahData){pkX_1=1;}
+var kasusX_2=_.countBy(data,{type:'X',last_angle:data2_s2});var pkX_2=kasusX_2.true/dataX.true;if(kasusX_2.false==jumlahData){pkX_2=1;}
+var kasusY_1=_.countBy(data,{type:'Y',first_angle:data1_s2});var pkY_1=kasusY_1.true/dataY.true;if(kasusY_1.false==jumlahData){pkY_1=1;}
+var kasusY_2=_.countBy(data,{type:'Y',last_angle:data2_s2});var pkY_2=kasusY_2.true/dataY.true;if(kasusY_2.false==jumlahData){pkY_2=1;}
+
+	
+probA=(pkA_1*pkA_2*classA);probB=(pkB_1*pkB_2*classB);probC=(pkC_1*pkC_2*classC);probD=(pkD_1*pkD_2*classD);probE=(pkE_1*pkE_2*classE);probF=(pkF_1*pkF_2*classF);probH=(pkH_1*pkH_2*classH);probI=(pkI_1*pkI_2*classI);probJ=(pkJ_1*pkJ_2*classJ);probK=(pkK_1*pkK_2*classK);probL=(pkL_1*pkL_2*classL);probM=(pkM_1*pkM_2*classM);probN=(pkN_1*pkN_2*classN);probO=(pkO_1*pkO_2*classO);probP=(pkP_1*pkP_2*classP);probR=(pkR_1*pkR_2*classR);probS=(pkS_1*pkS_2*classS);probT=(pkT_1*pkT_2*classT);probU=(pkU_1*pkU_2*classU);probV=(pkV_1*pkV_2*classV);probW=(pkW_1*pkW_2*classW);probZ=(pkZ_1*pkZ_2*classZ);
+
+probG=(pkG_1*pkG_2*classG);
+probQ=(pkQ_1*pkQ_2*classQ);
+probX=(pkX_1*pkX_2*classX);
+probY=(pkY_1*pkY_2*classY);
+
+if(probA==classA){probA=0};if(probB==classB){probB=0};if(probC==classC){probC=0};if(probD==classD){probD=0};if(probE==classE){probE=0};if(probF==classF){probF=0};if(probH==classH){probH=0};if(probI==classI){probI=0};if(probJ==classJ){probJ=0};if(probK==classK){probK=0};if(probL==classL){probL=0};if(probM==classM){probM=0};if(probN==classN){probN=0};if(probO==classO){probO=0};if(probP==classP){probP=0};if(probR==classR){probR=0};if(probS==classS){probS=0};if(probT==classT){probT=0};if(probU==classU){probU=0};if(probV==classV){probV=0};if(probW==classW){probW=0};if(probZ==classZ){probZ=0};
+if (probG == classG) {probG = 0};
+if (probQ == classQ) {probQ = 0};
+if (probX == classX) {probX = 0};
+if (probY == classY) {probY = 0};
+	
+	hasil.push({type:'A',probabilitas:probA},{type:'B',probabilitas:probB},{type:'C',probabilitas:probC},{type:'D',probabilitas:probD},{type:'E',probabilitas:probE},{type:'F',probabilitas:probF},{type:'G',probabilitas:probG},{type:'H',probabilitas:probH},{type:'I',probabilitas:probI},{type:'J',probabilitas:probJ},{type:'K',probabilitas:probK},{type:'L',probabilitas:probL},{type:'M',probabilitas:probM},{type:'N',probabilitas:probN},{type:'O',probabilitas:probO},{type:'P',probabilitas:probP},{type:'Q',probabilitas:probQ},{type:'R',probabilitas:probR},{type:'S',probabilitas:probS},{type:'T',probabilitas:probT},{type:'U',probabilitas:probU},{type:'V',probabilitas:probV},{type:'W',probabilitas:probW},{type:'X',probabilitas:probX},{type:'Z',probabilitas:probZ},{type:'Z',probabilitas:probZ});	
+    
+	  for (i = 0; i < hasil.length; i++) {
+	     console.log(hasil[i].type + "   "  + hasil[i].probabilitas);
+	  }
+	  
+	tMax();  
+
+}
+
+
+	</script>
+		<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+		<script type="text/javascript" charset="utf-8" src="cordova_plugins.js"></script>
+    
+	<script type="text/javascript" charset="utf-8">
+
+        // Wait for Cordova to load
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        // Cordova is ready
+        //
+        function onDeviceReady() {
+       
+        }
+        
+        // Audio player
+        //
+          var my_media = null;
+        var mediaTimer = null;
+
+      
+        // Play audio
+        //
+        function playAudio(src) {
+            // Create Media object from src
+            my_media = new Media(src, onSuccess, onError);
+
+            // Play audio
+            my_media.play();
+
+            // Update my_media position every second
+            if (mediaTimer == null) {
+                mediaTimer = setInterval(function() {
+                    // get my_media position
+                    my_media.getCurrentPosition(
+                        // success callback
+                        function(position) {
+                            if (position > -1) {
+                                setAudioPosition((position) + " sec");
+                            }
+                        },
+                        // error callback
+                        function(e) {
+                            console.log("Error getting pos=" + e);
+                            setAudioPosition("Error: " + e);
+                        }
+                    );
+                }, 1000);
+            }
+        }
+
+        // Pause audio
+        // 
+        function pauseAudio() {
+            if (my_media) {
+                my_media.pause();
+            }
+        }
+
+        // Stop audio
+        // 
+        function stopAudio() {
+            if (my_media) {
+                my_media.stop();
+            }
+            clearInterval(mediaTimer);
+            mediaTimer = null;
+        }
+
+        // onSuccess Callback
+        //
+        function onSuccess() {
+            console.log("playAudio():Audio Success");
+        }
+
+        // onError Callback 
+        //
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' + 
+                  'message: ' + error.message + '\n');
+        }
+
+        // Set audio position
+        // 
+        function setAudioPosition(position) {
+            document.getElementById('audio_position').innerHTML = position;
+        }
+        
+       </script>
+</head>
+<body>
+	
+		 <div id="outer" >  
+      <div id="canvas" ></div>
+	  </div>
+	  <a class="button rotate2" onclick="clearCanvas()" href="#">Ulangi</a>
+	  <a class="button rotate2" onclick="bayesCalc()" href="#">Recognition</a>
+	  <br/><br/><p style="display:inline" id="hasil"></p>
+		  <br/><br/>
+	  <div id="table">
+	
+	
+	 
+      </div>
+ 
+
+</body>
+</html>
